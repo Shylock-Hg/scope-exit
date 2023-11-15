@@ -21,6 +21,12 @@ impl<'a> Drop for ScopeExit<'a> {
     }
 }
 
+macro_rules! scope_exit {
+    ($call: expr) => {
+        let _scope_exit = ScopeExit::new($call);
+    };
+}
+
 #[cfg(test)]
 mod test {
     // modify local variable
@@ -33,8 +39,25 @@ mod test {
             let call = || {
                 i = 2;
             };
-            let scope_exit = ScopeExit::new(Box::new(call));
+            let _scope_exit = ScopeExit::new(Box::new(call));
         }
         assert_eq!(i, 2);
+    }
+
+    #[test]
+    fn modify_local_variable_by_macro_test() {
+        let mut i = 0;
+        let mut j = 0;
+        {
+            scope_exit!(|| {
+                i = 1;
+            });
+
+            scope_exit!(|| {
+                j = 2;
+            });
+        }
+        assert_eq!(i, 1);
+        assert_eq!(j, 2);
     }
 }
