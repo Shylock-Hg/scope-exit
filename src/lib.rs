@@ -56,6 +56,8 @@ mod test {
             scope_exit!(|| {
                 j = 2;
             });
+            // The first scope_exit also called by RAII, won't be triggered
+            // by the definition of the second scope_exit.
         }
         assert_eq!(i, 1);
         assert_eq!(j, 2);
