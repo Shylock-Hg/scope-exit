@@ -8,7 +8,7 @@ e.g. Call c file API
 ```rust
 fn test() {
     let fp = fopen("test.txt");
-    scope_exit!(|| fclose(fp););
+    scope_exit!(fclose(fp));
     // will call `fclose` by RAII
 }
 ```
