@@ -22,8 +22,11 @@ impl<'a> Drop for ScopeExit<'a> {
 }
 
 macro_rules! scope_exit {
-    ($call: expr) => {
-        let _scope_exit = ScopeExit::new($call);
+    ($call: block) => {
+        let _scope_exit = ScopeExit::new(|| $call);
+    };
+    ($call: stmt) => {
+        let _scope_exit = ScopeExit::new(|| {$call});
     };
 }
 
@@ -49,13 +52,13 @@ mod test {
         let mut i = 0;
         let mut j = 0;
         {
-            scope_exit!(|| {
+            scope_exit!({
                 i = 1;
             });
 
-            scope_exit!(|| {
-                j = 2;
-            });
+            scope_exit!(
+                j = 2
+            );
             // The first scope_exit also called by RAII, won't be triggered
             // by the definition of the second scope_exit.
         }
