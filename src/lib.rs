@@ -26,7 +26,16 @@ macro_rules! scope_exit {
         let _scope_exit = ScopeExit::new(|| $call);
     };
     ($call: stmt) => {
-        let _scope_exit = ScopeExit::new(|| {$call});
+        let _scope_exit = ScopeExit::new(|| $call);
+    };
+}
+
+macro_rules! defer {
+    ($call: block) => {
+        let _scope_exit = ScopeExit::new(|| $call);
+    };
+    ($call: stmt) => {
+        let _scope_exit = ScopeExit::new(|| $call);
     };
 }
 
@@ -56,9 +65,24 @@ mod test {
                 i = 1;
             });
 
-            scope_exit!(
-                j = 2
-            );
+            scope_exit!(j = 2);
+            // The first scope_exit also called by RAII, won't be triggered
+            // by the definition of the second scope_exit.
+        }
+        assert_eq!(i, 1);
+        assert_eq!(j, 2);
+    }
+
+    #[test]
+    fn modify_local_variable_by_macro_defer_test() {
+        let mut i = 0;
+        let mut j = 0;
+        {
+            defer!({
+                i = 1;
+            });
+
+            defer!(j = 2);
             // The first scope_exit also called by RAII, won't be triggered
             // by the definition of the second scope_exit.
         }
