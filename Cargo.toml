@@ -1,6 +1,6 @@
 [package]
 name = "scope-exit"
-version = "0.1.0"
+version = "0.2.0"
 edition = "2021"
 license = "Apache-2.0"
 description = "The util to call procedure when exit current scope. scope exit. like defer in go."
